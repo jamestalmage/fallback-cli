@@ -25,8 +25,7 @@ if (expectedShim === 'global') {
 }
 
 require('fallback-cli')({
-	module: 'cli_module',
-	cliPath: './cli',
+	path: 'cli_module/cli',
 	before: function (location, cliPath) {
 		console.log('  before:', location, relative(cliPath));
 		assert.strictEqual(location, expectedLocation);
