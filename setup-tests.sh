@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd $DIR
 
-./clean.sh
+./clean-tests.sh
 
 cd $DIR
 

@@ -1,3 +1,4 @@
+/* eslint global-require: 0 */
 'use strict';
 var path = require('path');
 var resolve = require('resolve');
