@@ -23,9 +23,9 @@ module.exports = function (opts, cliPathArg, globalPathArg) {
 	validate(local, 'string', 'globalCliPath');
 
 	var beforeFn = validate(opts.before || noop, 'function', 'before');
+	var requireFn = validate(opts.require || require, 'function', 'require');
 	var runFn = validate(opts.run || returnThirdArg, 'function', 'run');
 	var afterFn = validate(opts.after || noop, 'function', 'after');
-	var requireFn = validate(opts.require || require, 'function', 'require');
 
 	var cliPath;
 	var location;
