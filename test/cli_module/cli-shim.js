@@ -37,14 +37,6 @@ require('fallback-cli')({
 		assert.strictEqual(location, expectedLocation);
 		assert.strictEqual(cliModule, expectedCli);
 		assert.strictEqual('beforeResult', result);
-		return 'runResult';
-	},
-	after: function (location, cliModule, result) {
-		console.log('  after:', location, cliModule, result);
-		assert.strictEqual(location, expectedLocation);
-		assert.strictEqual(cliModule, expectedCli);
-		assert.strictEqual('runResult', result);
-		console.log();
 		console.log();
 	}
 });

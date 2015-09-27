@@ -24,8 +24,7 @@ module.exports = function (opts, cliPathArg, globalPathArg) {
 
 	var beforeFn = validate(opts.before || noop, 'function', 'before');
 	var requireFn = validate(opts.require || require, 'function', 'require');
-	var runFn = validate(opts.run || returnThirdArg, 'function', 'run');
-	var afterFn = validate(opts.after || noop, 'function', 'after');
+	var runFn = validate(opts.run || noop, 'function', 'run');
 
 	var cliPath;
 	var location;
@@ -55,19 +54,11 @@ module.exports = function (opts, cliPathArg, globalPathArg) {
 	}
 
 	function run(result) {
-		runAsync(runFn, after, location, cliModule, result);
-	}
-
-	function after(result) {
-		runAsync(afterFn, noop, location, cliModule, result);
+		runFn(location, cliModule, result);
 	}
 };
 
 function noop() {}
-
-function returnThirdArg(a, b, c) {
-	return c;
-}
 
 function validate(val, type, prop) {
 	assert.strictEqual(typeof val, type, 'typeof options.' + prop);
