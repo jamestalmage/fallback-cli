@@ -4,15 +4,28 @@ var path = require('path');
 var resolve = require('resolve');
 var caller = require('caller');
 var runAsync = require('run-async');
+var assert = require('assert');
 
-module.exports = function (opts) {
-	var moduleName = opts.module;
+module.exports = function (opts, cliPathArg, globalPathArg) {
+	if (typeof opts === 'string') {
+		opts = {
+			module: opts,
+			cliPath: cliPathArg,
+			globalCliPath: globalPathArg
+		};
+	}
+	var moduleName = validate(opts.module, 'string', 'module');
+
 	var local = opts.localCliPath || opts.cliPath;
+	validate(local, 'string', 'cliPath|localCliPath');
+
 	var global = opts.globalCliPath || local;
-	var beforeFn = opts.before || noop;
-	var runFn = opts.run || returnThirdArg;
-	var afterFn = opts.after || noop;
-	var requireFn = opts.require || require;
+	validate(local, 'string', 'globalCliPath');
+
+	var beforeFn = validate(opts.before || noop, 'function', 'before');
+	var runFn = validate(opts.run || returnThirdArg, 'function', 'run');
+	var afterFn = validate(opts.after || noop, 'function', 'after');
+	var requireFn = validate(opts.require || require, 'function', 'require');
 
 	var cliPath;
 	var location;
@@ -54,4 +67,9 @@ function noop() {}
 
 function returnThirdArg(a, b, c) {
 	return c;
+}
+
+function validate(val, type, prop) {
+	assert.strictEqual(typeof val, type, 'typeof options.' + prop);
+	return val;
 }
