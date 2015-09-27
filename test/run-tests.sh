@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 export FALLBACK_CLI_FIXTURE_BASE=$DIR
 
-echo "*  *module_a using global command  **"
+echo "**  module_a using global command  **"
 cd $DIR/module_a
 EXPECT_SHIM=global EXPECT_CLI=a ../cli_module/cli-shim.js
 
