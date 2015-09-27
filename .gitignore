@@ -1,0 +1,7 @@
+/node_modules
+**/node_modules/fallback-cli
+/test/fixture/module_a/node_modules/cli_module/cli-shim.js
+/test/fixture/module_a/node_modules/cli_module/package.json
+/test/fixture/module_b/node_modules/cli_module/cli-shim.js
+/test/fixture/module_b/node_modules/cli_module/package.json
+.idea

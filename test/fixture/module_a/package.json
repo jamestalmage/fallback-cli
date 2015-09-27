@@ -1,0 +1,11 @@
+{
+  "name": "module_a",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cli_module"
+  },
+  "author": "James Talmage <james@talmage.io>",
+  "license": "MIT"
+}

@@ -1,0 +1,12 @@
+{
+  "name": "cli_module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./cli-shim.js"
+  },
+  "author": "James Talmage <james@talmage.io>",
+  "license": "MIT",
+  "bin" : "cli-shim.js"
+}
