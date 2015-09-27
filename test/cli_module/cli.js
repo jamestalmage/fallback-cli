@@ -1,2 +1,2 @@
-console.log('required: global');
+console.log('  required: global');
 module.exports = 'global';
