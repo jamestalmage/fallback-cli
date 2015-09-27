@@ -24,6 +24,11 @@ if (expectedShim === 'global') {
 	);
 }
 
+process.nextTick(function () {
+	console.log('did not exit synchronously');
+	process.exit(1);
+});
+
 require('fallback-cli')({
 	path: 'cli_module/cli',
 	before: function (location, cliPath) {
@@ -37,6 +42,7 @@ require('fallback-cli')({
 		assert.strictEqual(cliModule, expectedCli);
 		assert.strictEqual('beforeResult', result);
 		console.log();
+		process.exit(0);
 	}
 });
 
