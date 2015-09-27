@@ -8,8 +8,8 @@ cd $DIR
 
 cd $DIR
 
-cp test/fixture/cli_module/{package.json,cli-shim.js} test/fixture/module_a/node_modules/cli_module
-cp test/fixture/cli_module/{package.json,cli-shim.js} test/fixture/module_b/node_modules/cli_module
-ln -s $DIR test/fixture/cli_module/node_modules/fallback-cli
-ln -s $DIR test/fixture/module_a/node_modules/cli_module/node_modules/fallback-cli
-ln -s $DIR test/fixture/module_b/node_modules/cli_module/node_modules/fallback-cli
+cp test/cli_module/{package.json,cli-shim.js} test/module_a/node_modules/cli_module
+cp test/cli_module/{package.json,cli-shim.js} test/module_b/node_modules/cli_module
+ln -s $DIR test/cli_module/node_modules/fallback-cli
+ln -s $DIR test/module_a/node_modules/cli_module/node_modules/fallback-cli
+ln -s $DIR test/module_b/node_modules/cli_module/node_modules/fallback-cli

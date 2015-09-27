@@ -2,7 +2,7 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export FALLBACK_CLI_FIXTURE_BASE=$DIR/test/fixture
+export FALLBACK_CLI_FIXTURE_BASE=$DIR/test
 FB=$FALLBACK_CLI_FIXTURE_BASE
 
 cd $FB/module_a

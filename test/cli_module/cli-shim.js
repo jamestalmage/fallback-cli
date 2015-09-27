@@ -24,7 +24,6 @@ if (expectedShim === 'global') {
 	);
 }
 
-
 require('fallback-cli')({
 	module: 'cli_module',
 	cliPath: './cli',
