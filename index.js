@@ -12,6 +12,7 @@ module.exports = function (opts) {
 	var beforeFn = opts.before || noop;
 	var runFn = opts.run || returnThirdArg;
 	var afterFn = opts.after || noop;
+	var requireFn = opts.require || require;
 
 	var cliPath;
 	var location;
@@ -29,10 +30,18 @@ module.exports = function (opts) {
 		}
 	}
 
-	runAsync(beforeFn, run, location, cliPath);
+	runAsync(beforeFn, doRequire, location, cliPath);
+
+	function doRequire(beforeResult) {
+		runAsync(requireFn, setCliModule, cliPath);
+
+		function setCliModule(requireResult) {
+			cliModule = requireResult;
+			run(beforeResult);
+		}
+	}
 
 	function run(result) {
-		cliModule = require(cliPath);
 		runAsync(runFn, after, location, cliModule, result);
 	}
 
