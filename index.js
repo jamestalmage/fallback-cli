@@ -42,4 +42,6 @@ module.exports = function (opts) {
 
 function noop() {}
 
-function returnThirdArg(a, b, c) {return c;}
+function returnThirdArg(a, b, c) {
+	return c;
+}
