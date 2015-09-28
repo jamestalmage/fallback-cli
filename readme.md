@@ -34,7 +34,7 @@ Next update your `package.json` to point to `cli-shim.js`.
 }
 ```
 
-That's it! Now your globally installed CLI will use the locally installed version. In most
+*That's it!* Now your globally installed CLI will use the locally installed version. In most
 cases this will even be backwards compatible with versions before you introduced `fallback-cli`.
 
 **Note:** `cli.js` and `cli-shim.js` are arbitrary file names, use whatever you wish.
