@@ -34,14 +34,17 @@ Next update your `package.json` to point to `cli-shim.js`.
 }
 ```
 
-*That's it!* Now your globally installed CLI will use the locally installed version. In most
-cases this will even be backwards compatible with versions before you introduced `fallback-cli`.
+*That's it!* 
 
-**Note:** `cli.js` and `cli-shim.js` are arbitrary file names, use whatever you wish.
+Your globally installed CLI will use the local version from `node_modules` if it exists.
+In most cases this will even be backwards compatible with versions of your CLI before you introduced `fallback-cli`.
+
+**Note:** `cli.js` and `cli-shim.js` are arbitrary file names, use whatever you want.
 
 ## Advanced Usage
 
-Instead of a conventional `cli.js`, have it export a function:
+Instead of a conventional `cli.js` that begins executing immediately, export a callback that
+starts execution:
 
 ```js
 var minimist = require('minimist'); // or whatever argv processor you prefer
@@ -63,12 +66,12 @@ require('fallback-cli')({
   path: 'my-module/bin/cli.js',
   run: function (location, cli) {
     
-    // only necessary if you legacy cli implementations that do not export a function.
+    // only necessary if legacy cli implementations do NOT export a function.
     if (typeof cli !== 'function') {
       return; // legacy cli - already executed upon "require"
     }
     
-    // run the new cli that does export a function. 
+    // run the new cli that DOES export a function. 
     cli(process.argv.slice(2));
   }
 });
@@ -78,11 +81,11 @@ A couple key advantages to this approach. First, requiring `cli.js` no longer ha
 Second, you now have a nice hook for testing your cli. 
 
 Exporting your package version is not required, but highly recommended.
-It will allow you to use `semver` to modify how `cli-shim.js` runs things in the future.
+It will allow you to use `semver` to handle special cases in the future.
 
 ```js
 #!/usr/bin/env node
-var shimVersion = require('./package.json').version;
+var shimVersion = require('../package.json').version;
 var semver = require('semver');
 
 require('fallback-cli')({
@@ -154,7 +157,7 @@ Type: `callback(location, cliModulePath)`
 
 *optional*
 
-Allows you to intercept the `require` of your cliModule.
+Intercept the `require` of your CLI module.
 
 Type: `callback(cliModulePath)`
 
@@ -162,7 +165,7 @@ Type: `callback(cliModulePath)`
    
 Return: the result of requiring `cliModulePath`.
 
-Defaults to using nodes built-in`require` method.
+Defaults to using nodes built-in `require` method.
 
 Possible uses might be invoking a preprocessor (i.e. `coffescript`).
 
@@ -173,7 +176,7 @@ Possible uses might be invoking a preprocessor (i.e. `coffescript`).
 Used to execute your cli. Run after your CLI module is `require`'d.
 
 In conventional cases, simply `require`ing you CLI module will cause it to execute. 
-As described in [`Advanced Usage`](#Advanced Usage), there are reasons that is undesirable.
+As described in [`Advanced Usage`](#advanced-usage), there are reasons that is undesirable.
 
 Type: `callback(location, cliModule, beforeResult)`
 
