@@ -1,7 +1,7 @@
 {
   "name": "fallback-cli",
   "version": "1.0.0",
-  "description": "My well-made module",
+  "description": "Default to the locally installed version of your CLI, use the global one if not found.",
   "license": "MIT",
   "repository": "jamestalmage/fallback-cli",
   "author": {
