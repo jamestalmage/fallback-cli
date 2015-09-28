@@ -16,7 +16,7 @@ function normalizeArgs(args) {
 		}
 	}
 	var path = validate(opts.path, 'string', 'path');
-	var relative = validate(opts.relative || './' + basename(path), 'string');
+	var relative = validate(opts.relative || './' + basename(path), 'string', 'relative');
 	var before = validate(opts.before || noop, 'function', 'before');
 	var requireFn = validate(opts.require || require, 'function', 'require');
 	var run = validate(opts.run || noop, 'function', 'run');
