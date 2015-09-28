@@ -16,7 +16,8 @@
     "test": "./test/clean-tests.sh && xo && mocha test/*-test.js && ./test/test.sh"
   },
   "files": [
-    "index.js"
+    "index.js",
+    "normalize-args.js"
   ],
   "keywords": [
     "cli",
