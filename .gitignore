@@ -1,7 +1,5 @@
 /node_modules
 **/node_modules/fallback-cli
 /test/module_a/node_modules/cli_module/cli-shim.js
-/test/module_a/node_modules/cli_module/package.json
 /test/module_b/node_modules/cli_module/cli-shim.js
-/test/module_b/node_modules/cli_module/package.json
 .idea

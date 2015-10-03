@@ -1,10 +1,19 @@
 #!/usr/bin/env node
+/* eslint global-require: 0 */
 var path = require('path');
 var assert = require('assert');
 var expectedShim = process.env.EXPECT_SHIM;
 var expectedCli = process.env.EXPECT_CLI;
 var fixtureBase = process.env.FALLBACK_CLI_FIXTURE_BASE;
 var expectedLocation = expectedCli === 'global' ? 'global' : 'local';
+var expectedVersions = {
+	a: '0.0.1',
+	b: '0.0.2',
+	global: '0.0.3'
+};
+var expectedShimVersion = expectedVersions[expectedShim];
+var expectedCliVersion = expectedLocation === 'global' ? null : expectedVersions[expectedCli];
+
 var shimPath = relative(__filename);
 console.log('  shim: ' + shimPath);
 
@@ -41,6 +50,17 @@ require('fallback-cli')({
 		assert.strictEqual(options.location, expectedLocation);
 		assert.strictEqual(cliModule, expectedCli);
 		assert.strictEqual('beforeResult', result);
+
+		var shimPkg = require(options.globalPkg);
+		assert.strictEqual(shimPkg.version, expectedShimVersion);
+
+		if (expectedCliVersion === null) {
+			assert.strictEqual(options.localPkg, null);
+		} else {
+			var localPkg = require(options.localPkg);
+			assert.strictEqual(localPkg.version, expectedCliVersion);
+		}
+
 		console.log();
 		process.exit(0);
 	}
