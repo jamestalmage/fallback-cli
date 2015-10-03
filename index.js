@@ -9,19 +9,16 @@ var normalizeArgs = require('./normalize-args');
 module.exports = function (opts) {
 	opts = normalizeArgs(arguments);
 
-	var cliPath;
-	var location;
+	var cliPath = resolveSync(opts.path, process.cwd());
+	var location = 'local';
 
-	try {
-		cliPath = resolveSync(opts.path, process.cwd());
-		location = 'local';
-	} catch (e) {
-		try {
-			cliPath = resolveSync(opts.relative, dirname(caller()));
-			location = 'global';
-		} catch (e) {
-			throw new Error('fallback-cli could not find global', e);
-		}
+	if (!cliPath) {
+		cliPath = resolveSync(opts.relative, dirname(caller()));
+		location = 'global';
+	}
+
+	if (!cliPath) {
+		throw new Error('fallback-cli could not find local or global');
 	}
 
 	runAsync(opts.before, doRequire, location, cliPath);
@@ -36,5 +33,9 @@ module.exports = function (opts) {
 };
 
 function resolveSync(path, basedir) {
-	return resolve.sync(path, {basedir: basedir});
+	try {
+		return resolve.sync(path, {basedir: basedir});
+	} catch (e) {
+		return null;
+	}
 }
