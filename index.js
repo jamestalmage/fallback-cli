@@ -3,7 +3,6 @@ var path = require('path');
 var dirname = path.dirname;
 var resolve = require('resolve');
 var caller = require('caller');
-var runAsync = require('run-async');
 var normalizeArgs = require('./normalize-args');
 
 module.exports = function (opts) {
@@ -43,15 +42,7 @@ module.exports = function (opts) {
 		location: localCli ? 'local' : 'global'
 	};
 
-	runAsync(opts.before, doRequire, callbackOptions);
-
-	function doRequire(beforeResult) {
-		runAsync(opts.require, setCliModule, callbackOptions);
-
-		function setCliModule(requireResult) {
-			opts.run(callbackOptions, requireResult, beforeResult);
-		}
-	}
+	return opts.run(callbackOptions);
 };
 
 function computeGlobalPackagePath(cliPath, packagePath, relative) {

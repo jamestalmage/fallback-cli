@@ -1,10 +1,9 @@
 'use strict';
-normalizeArgs.noop = noop;
 normalizeArgs.validate = validate;
 module.exports = normalizeArgs;
 var basename = require('path').basename;
 var assert = require('assert');
-var defaultRequire = require('./default-require');
+var defaultRunner = require('./default-runner');
 
 function normalizeArgs(args) {
 	var opts = args[0];
@@ -14,24 +13,21 @@ function normalizeArgs(args) {
 		};
 		if (typeof args[1] === 'string') {
 			opts.relative = args[1];
+			opts.run = args[2];
+		} else {
+			opts.run = args[1];
 		}
 	}
 	var path = validate(opts.path, 'string', 'path');
 	var relative = validate(opts.relative || './' + basename(path), 'string', 'relative');
-	var before = validate(opts.before || noop, 'function', 'before');
-	var requireFn = validate(opts.require || defaultRequire, 'function', 'require');
-	var run = validate(opts.run || noop, 'function', 'run');
+	var run = validate(opts.run || defaultRunner, 'function', 'run');
 
 	return {
 		path: path,
 		relative: relative,
-		before: before,
-		require: requireFn,
 		run: run
 	};
 }
-
-function noop() {}
 
 function validate(val, type, prop) {
 	assert.strictEqual(typeof val, type, 'typeof options.' + prop);

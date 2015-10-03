@@ -38,18 +38,13 @@ process.nextTick(function () {
 	process.exit(1);
 });
 
-require('fallback-cli')({
-	path: 'cli_module/cli',
-	before: function (options) {
-		console.log('  before:', options.location, relative(options.cli));
-		assert.strictEqual(options.location, expectedLocation);
-		return 'beforeResult';
-	},
-	run: function (options, cliModule, result) {
-		console.log('  run:', options.location, cliModule, result);
+require('fallback-cli')(
+	'cli_module/cli',
+	function (options) {
+		var cliModule = require(options.cli);
+		console.log('  run:', options.location, cliModule);
 		assert.strictEqual(options.location, expectedLocation);
 		assert.strictEqual(cliModule, expectedCli);
-		assert.strictEqual('beforeResult', result);
 
 		var shimPkg = require(options.globalPkg);
 		assert.strictEqual(shimPkg.version, expectedShimVersion);
@@ -64,7 +59,7 @@ require('fallback-cli')({
 		console.log();
 		process.exit(0);
 	}
-});
+);
 
 function relative(p) {
 	return path.relative(fixtureBase, p);
