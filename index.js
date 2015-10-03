@@ -1,4 +1,3 @@
-/* eslint global-require: 0 */
 'use strict';
 var dirname = require('path').dirname;
 var resolve = require('resolve');
@@ -9,22 +8,24 @@ var normalizeArgs = require('./normalize-args');
 module.exports = function (opts) {
 	opts = normalizeArgs(arguments);
 
-	var cliPath = resolveSync(opts.path, process.cwd());
-	var location = 'local';
+	var localCli = resolveSync(opts.path, process.cwd());
+	var globalCli = resolveSync(opts.relative, dirname(caller()));
+	var location = localCli ? 'local' : 'global';
+	var cliPath = localCli || globalCli;
 
-	if (!cliPath) {
-		cliPath = resolveSync(opts.relative, dirname(caller()));
-		location = 'global';
-	}
-
-	if (!cliPath) {
+	if (!(localCli || globalCli)) {
 		throw new Error('fallback-cli could not find local or global');
 	}
 
 	runAsync(opts.before, doRequire, location, cliPath);
 
 	function doRequire(beforeResult) {
-		runAsync(opts.require, setCliModule, cliPath);
+		var requireOptions = {
+			localCli: localCli,
+			globalCli: globalCli
+		};
+
+		runAsync(opts.require, setCliModule, requireOptions);
 
 		function setCliModule(requireResult) {
 			opts.run(location, requireResult, beforeResult);

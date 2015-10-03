@@ -4,6 +4,7 @@ normalizeArgs.validate = validate;
 module.exports = normalizeArgs;
 var basename = require('path').basename;
 var assert = require('assert');
+var defaultRequire = require('./default-require');
 
 function normalizeArgs(args) {
 	var opts = args[0];
@@ -18,7 +19,7 @@ function normalizeArgs(args) {
 	var path = validate(opts.path, 'string', 'path');
 	var relative = validate(opts.relative || './' + basename(path), 'string', 'relative');
 	var before = validate(opts.before || noop, 'function', 'before');
-	var requireFn = validate(opts.require || require, 'function', 'require');
+	var requireFn = validate(opts.require || defaultRequire, 'function', 'require');
 	var run = validate(opts.run || noop, 'function', 'run');
 
 	return {
