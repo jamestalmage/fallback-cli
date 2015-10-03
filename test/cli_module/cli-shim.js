@@ -31,14 +31,14 @@ process.nextTick(function () {
 
 require('fallback-cli')({
 	path: 'cli_module/cli',
-	before: function (location, cliPath) {
-		console.log('  before:', location, relative(cliPath));
-		assert.strictEqual(location, expectedLocation);
+	before: function (options) {
+		console.log('  before:', options.location, relative(options.cli));
+		assert.strictEqual(options.location, expectedLocation);
 		return 'beforeResult';
 	},
-	run: function (location, cliModule, result) {
-		console.log('  run:', location, cliModule, result);
-		assert.strictEqual(location, expectedLocation);
+	run: function (options, cliModule, result) {
+		console.log('  run:', options.location, cliModule, result);
+		assert.strictEqual(options.location, expectedLocation);
 		assert.strictEqual(cliModule, expectedCli);
 		assert.strictEqual('beforeResult', result);
 		console.log();

@@ -10,25 +10,25 @@ module.exports = function (opts) {
 
 	var localCli = resolveSync(opts.path, process.cwd());
 	var globalCli = resolveSync(opts.relative, dirname(caller()));
-	var location = localCli ? 'local' : 'global';
-	var cliPath = localCli || globalCli;
 
 	if (!(localCli || globalCli)) {
 		throw new Error('fallback-cli could not find local or global');
 	}
 
-	runAsync(opts.before, doRequire, location, cliPath);
+	var callbackOptions = {
+		localCli: localCli,
+		globalCli: globalCli,
+		cli: localCli || globalCli,
+		location: localCli ? 'local' : 'global'
+	};
+
+	runAsync(opts.before, doRequire, callbackOptions);
 
 	function doRequire(beforeResult) {
-		var requireOptions = {
-			localCli: localCli,
-			globalCli: globalCli
-		};
-
-		runAsync(opts.require, setCliModule, requireOptions);
+		runAsync(opts.require, setCliModule, callbackOptions);
 
 		function setCliModule(requireResult) {
-			opts.run(location, requireResult, beforeResult);
+			opts.run(callbackOptions, requireResult, beforeResult);
 		}
 	}
 };
