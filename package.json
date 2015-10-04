@@ -17,7 +17,8 @@
   },
   "files": [
     "index.js",
-    "normalize-args.js"
+    "normalize-args.js",
+    "default-runner.js"
   ],
   "keywords": [
     "cli",
