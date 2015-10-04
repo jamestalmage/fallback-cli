@@ -91,6 +91,7 @@ If that is not possible, you *may* use `relativePath` to describe where it is re
   
   * `location`: Either `"local"` or `"global"` depending on which is found (`local` takes precedence).
 
+**Note:** All properties are of type `string`. All properties except `location` can also be `null`.
 
 ## Alternate API
 
