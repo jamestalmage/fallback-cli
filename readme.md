@@ -14,9 +14,9 @@ $ npm install --save fallback-cli
 
 ## Usage
 
-Let's assume you have created package called `my-module`, and your CLI is `bin/cli.js`.
+The following assumes you have a package named `my-module`, and the CLI script is in `bin/cli.js`.
 
-First, create `cli-shim.js`, and place it in the *same folder* as your existing `cli.js`.
+First, create `cli-shim.js`, and place it in the *same directory* as your current CLI script.
 
 `bin/cli-shim.js`:
 
@@ -34,10 +34,10 @@ Next update your `package.json` to point to `cli-shim.js`.
 }
 ```
 
-*That's it!* 
+*That is it!* 
 
 Your globally installed CLI will use the local version from `node_modules` if it exists.
-In most cases this will even be backwards compatible with versions of your CLI before you introduced `fallback-cli`.
+In most cases this will even be compatible with old versions of your CLI before you introduced `fallback-cli`.
 
 **Note:** `cli.js` and `cli-shim.js` are arbitrary file names, use whatever you want.
 
@@ -70,7 +70,7 @@ If that is not possible, you *may* use `relativePath` to describe where it is re
   
 #### runnerOptions
   
-  If you specify a `customRunner` function, it is passed an object with the following options.
+  If you specify a `customRunner` function, it is passed an object with these properties:
 
   * `localCli`: The absolute path of the CLI script in the locally installed module. It will be `null` if there is no local install.
   
@@ -78,17 +78,20 @@ If that is not possible, you *may* use `relativePath` to describe where it is re
   
   * `localPkg`: The absolute path of `package.json` in the local module. Useful for determining the version of the local install. It will be `null` if there is no local install.
   
-  * `globalPkg`: The absolute path of `package.json` in the global module. Useful for determining the version of the global install.
+  * `globalPkg`: The absolute path of `package.json` in the global module. Useful for determining the version of the global install. It will be `null` if the locally installed script was invoked directly.
    
-  * `cli`: The same as `localCli` unless `localCli` is `null`, then the same as `globalCli`. Convenience property for the most common fallback method.
+  * `cli`: The same as `localCli` if found, otherwise falls back to be the same as `globalCli`. Convenience property for implementing a graceful fallback.
   
-  * `pkg`: The same as `localPkg` if found, otherwise falls back to the same `globalPkg`.
+  * `pkg`: The same as `localPkg` if found, otherwise falls back to be the same as `globalPkg`.
   
-  * `location`: Either `"global"` or `"local"` depending on which is found.
+  * `location`: Either `"local"` or `"global"` depending on which is found (`local` takes precedence).
+
+
+## Alternate API
 
 ### fallbackCli(options)
 
-Instead of individual arguments, you can provide a single `options` argument.
+As an alternative to individual arguments, you can provide a single `options` argument.
 
 #### options.path
 
