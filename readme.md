@@ -12,9 +12,9 @@ but this works even when invoking your CLI command directly from the console.
 $ npm install --save fallback-cli
 ```
 
-## Basic Usage
+## Usage
 
-Let's assume you've created package called `my-module`, and your CLI is `bin/cli.js`.
+Let's assume you have created package called `my-module`, and your CLI is `bin/cli.js`.
 
 First, create `cli-shim.js`, and place it in the *same folder* as your existing `cli.js`.
 
@@ -41,85 +41,54 @@ In most cases this will even be backwards compatible with versions of your CLI b
 
 **Note:** `cli.js` and `cli-shim.js` are arbitrary file names, use whatever you want.
 
-## Advanced Usage
-
-Instead of a conventional `cli.js` that begins executing immediately, export a callback that
-starts execution:
-
-```js
-var minimist = require('minimist'); // or whatever argv processor you prefer
-var version = require('./package.json').version;
-myCli.version = version;
-module.exports = myCli;
-
-function myCli(args) {
-  var args = minimist(args);
-  // do cool stuff!
-}
-```
-
-Similar to above, setup your `cli-shim.js`:
-
-```js
-#!/usr/bin/env node
-require('fallback-cli')({
-  path: 'my-module/bin/cli.js',
-  run: function (location, cli) {
-    
-    // only necessary if legacy cli implementations do NOT export a function.
-    if (typeof cli !== 'function') {
-      return; // legacy cli - already executed upon "require"
-    }
-    
-    // run the new cli that DOES export a function. 
-    cli(process.argv.slice(2));
-  }
-});
-```
-
-A couple key advantages to this approach. First, requiring `cli.js` no longer has side-effects. 
-Second, you now have a nice hook for testing your cli. 
-
-Exporting your package version is not required, but highly recommended.
-It will allow you to use `semver` to handle special cases in the future.
-
-```js
-#!/usr/bin/env node
-var shimVersion = require('../package.json').version;
-var semver = require('semver');
-
-require('fallback-cli')({
-  path: 'my-module/bin/cli.js',
-  run: function (location, cli) {
-    if (semver.gt(cli.version, shimVersion)) {
-      console.log('WARNING: your globally installed version is behind the local one, consider upgrading');
-    }
-    if (semver.lt(cli.version, '0.2.0') {
-      console.log('versions prior to 0.2.0 have a major security vulnerability, aborting');
-      process.exit(1);
-    }
-    cli(process.argv.slice(2));
-  }
-});
-```
-
 ## API
 
-### fallbackCli(path)
+### fallbackCli(path, [relativePath], [customRunner])
 
-`path` should be a string describing your packages name, 
-and the path to your CLI implementation (i.e. `my-module/bin/my-cli.js`).
+Only `path` is required.
+
+  * `path`: *must* be a `string` describing your packages name, and the path to your CLI within the package (i.e. `my-module/bin/my-cli.js`).
         
-### fallbackCli(path, relativePath)
+  * `relativePath`: It is *highly recommended* that your "shim" to be installed in the same directory as the actual CLI. 
+If that is not possible, you *may* use `relativePath` to describe where it is relative to the shim.
 
-By default, we expect the "shim" to be installed in the same directory as the actual CLI implementation. 
-If that is not possible, you can use `relativePath` to describe where it is relative to the shim.
+    ```js
+    fallbackCli('my-module/bin/the-cli.js', '../bin/the-cli.js');
+    ```
+    
+  If specified, `relativePath` *must* point to the same file as `path`.
+    
+  * `customRunner`: A callback that that will be invoked with a single `runnerOptions` object. It should launch your CLI implementation.
+  
+  The default runner is simple: 
+  
+  ```js
+  function defaultRunner(runnerOptions) {
+    require(runnerOptions.cli);
+  }
+  ```
+  
+#### runnerOptions
+  
+  If you specify a `customRunner` function, it is passed an object with the following options.
 
-```js
-fallbackCli('my-module/bin/the-cli.js', '../bin/the-cli.js');
-```
+  * `localCli`: The absolute path of the CLI script in the locally installed module. It will be `null` if there is no local install.
+  
+  * `globalCli`: The absolute path of the CLI script in the globally installed module. It will be `null` if the locally installed script was invoked (i.e. via `npm run <script>`, or `./node_modules/.bin/`).
+  
+  * `localPkg`: The absolute path of `package.json` in the local module. Useful for determining the version of the local install. It will be `null` if there is no local install.
+  
+  * `globalPkg`: The absolute path of `package.json` in the global module. Useful for determining the version of the global install.
+   
+  * `cli`: The same as `localCli` unless `localCli` is `null`, then the same as `globalCli`. Convenience property for the most common fallback method.
+  
+  * `pkg`: The same as `localPkg` if found, otherwise falls back to the same `globalPkg`.
+  
+  * `location`: Either `"global"` or `"local"` depending on which is found.
 
 ### fallbackCli(options)
+
+Instead of individual arguments, you can provide a single `options` argument.
 
 #### options.path
 
@@ -137,82 +106,13 @@ Type: `string`
 
 Same as `relativePath` described in `fallbackCli(path, relativePath)` above.
 
-#### options.before
-
-*optional*
-
-Runs before you CLI module is `require`'d.
-
-Type: `callback(location, cliModulePath)`
-
-  * `location` - A string. 
-                 Will be `"local"` if there is a version of your CLI installed locally in `node-modules`. 
-                 Will be `"global"` if a local version is not found, and we are falling back to the global one. 
-                 
-  * `cliModulePath` - A string. The absolute path to the module that will be required.
-
-`before` can optionally return a result that will be passed to the `run` callback (described below).
-
-#### options.require
-
-*optional*
-
-Intercept the `require` of your CLI module.
-
-Type: `callback(cliModulePath)`
-
-  * `cliModulePath` - The absolute value of the path to be required.
-   
-Return: the result of requiring `cliModulePath`.
-
-Defaults to using nodes built-in `require` method.
-
-Possible uses might be invoking a preprocessor (i.e. `coffescript`).
-
 #### options.run
 
 *optional*
 
-Used to execute your cli. Run after your CLI module is `require`'d.
+Type: `callback(runnerOptions)`
 
-In conventional cases, simply `require`ing you CLI module will cause it to execute. 
-As described in [`Advanced Usage`](#advanced-usage), there are reasons that is undesirable.
-
-Type: `callback(location, cliModule, beforeResult)`
-
-  * `location` - A string. 
-                 Will be `"local"` if there is a version of your CLI installed locally in `node-modules`. 
-                 Will be `"global"` if a local version is not found, and we are falling back to the global one. 
-                 
-  * `cliModule` - Whatever value you exported from your actual CLI implementation (probably a function).
-                  If you provided a `require` callback, it will be whatever that result is.
-  
-  * `beforeResult` - Whatever value you returned from your `before` callback.
-
-#### looking for `options.after`?
-
-It doesn't exist. If you need this, use `options.run`, and pass a callback to your CLI implementation.
-
-## Async Operation
-
-By default, the entire process of loading your CLI and executing it happens synchronously.
-However, both the `options.before`, and `options.require` can be made asynchronous.
-
-`cli-shim.js`:
-
-```js
-#!/usr/bin/env node
-require('fallback-cli')({
-  path: 'my-module/cli',
-  before: function () {
-    var done = this.async();
-    
-    // do some stuff asynchronously, then...
-    
-    done(beforeResult);
-  };
-});
-```
+Same as `customRunner` described in `fallbackCli(path, customRunner)` above.
 
 ## License
 
