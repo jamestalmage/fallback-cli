@@ -76,9 +76,13 @@ If that is not possible, you *may* use `relativePath` to describe where it is re
   
   * `globalCli`: The absolute path of the CLI script in the globally installed module. It will be `null` if the locally installed script was invoked directly (i.e. via `npm run <script>`, or `./node_modules/.bin/my-cli`).
   
-  * `localPkg`: The absolute path of `package.json` in the local module. Useful for determining the version of the local install. It will be `null` if there is no local install.
+  * `localPkg`: The absolute path of `package.json` in the local module. Useful for determining the version of the local install. 
+                It will be `null` if there is no local install, or in the very unlikely event `package.json` could not be found in the locally installed module.
   
-  * `globalPkg`: The absolute path of `package.json` in the global module. Useful for determining the version of the global install. It will be `null` if the locally installed script was invoked directly.
+  * `globalPkg`: The absolute path of `package.json` in the global module. Useful for determining the version of the global install. 
+                 It will be `null` if the locally installed script was invoked directly, or if `package.json` could not be found in the globally installed module.
+                 It is possible to confuse the algorithm that finds the global `package.json` if you do not put the shim in the same directory as the CLI script and use the `relativePath` argument.
+                 For this reason, it is *highly recommended* you put them both in the same directory and avoid using `relativePath`. 
    
   * `cli`: The same as `localCli` if found, otherwise falls back to be the same as `globalCli`. Convenience property for implementing a graceful fallback.
   
