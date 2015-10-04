@@ -14,7 +14,7 @@ $ npm install --save fallback-cli
 
 ## Usage
 
-The following assumes you have a package named `my-module`, and the CLI script is in `bin/cli.js`.
+The following assumes you have a package named `my-module`, and the CLI script is `bin/cli.js`.
 
 First, create `cli-shim.js`, and place it in the *same directory* as your current CLI script.
 
@@ -74,7 +74,7 @@ If that is not possible, you *may* use `relativePath` to describe where it is re
 
   * `localCli`: The absolute path of the CLI script in the locally installed module. It will be `null` if there is no local install.
   
-  * `globalCli`: The absolute path of the CLI script in the globally installed module. It will be `null` if the locally installed script was invoked (i.e. via `npm run <script>`, or `./node_modules/.bin/`).
+  * `globalCli`: The absolute path of the CLI script in the globally installed module. It will be `null` if the locally installed script was invoked directly (i.e. via `npm run <script>`, or `./node_modules/.bin/my-cli`).
   
   * `localPkg`: The absolute path of `package.json` in the local module. Useful for determining the version of the local install. It will be `null` if there is no local install.
   
