@@ -8,22 +8,20 @@ var normalizeArgs = require('./normalize-args');
 module.exports = function (opts) {
 	opts = normalizeArgs(arguments);
 
-	var cwd = process.cwd();
-	var moduleName = opts.path.split(/[\/\\]/)[0];
-	var pkgPath = path.join(moduleName, 'package.json');
+	var currentDirectory = process.cwd();
 	var shimDirectory = dirname(caller());
 
-	var localCli = resolveSync(opts.path, cwd);
+	var localCli = resolveSync(opts.path, currentDirectory);
 	var localPkg = null;
 	if (localCli) {
-		localPkg = resolveSync(pkgPath, cwd);
+		localPkg = resolveSync(opts.pkgPath, currentDirectory);
 	}
 
 	var globalCli = resolveSync(opts.relative, shimDirectory);
 	var globalPkg = null;
 	if (globalCli) {
 		globalPkg = resolveSync(
-			computeGlobalPackagePath(opts.path, pkgPath, opts.relative),
+			opts.globalPkg,
 			shimDirectory
 		);
 	}
@@ -33,7 +31,7 @@ module.exports = function (opts) {
 	}
 
 	var callbackOptions = {
-		moduleName: moduleName,
+		moduleName: opts.moduleName,
 		localCli: localCli,
 		localPkg: localPkg,
 		globalCli: globalCli,
@@ -44,13 +42,6 @@ module.exports = function (opts) {
 
 	return opts.run(callbackOptions);
 };
-
-function computeGlobalPackagePath(cliPath, packagePath, relative) {
-	return './' + path.join(
-			dirname(relative),
-			path.relative(dirname(cliPath), packagePath)
-		);
-}
 
 function resolveSync(path, basedir) {
 	try {
