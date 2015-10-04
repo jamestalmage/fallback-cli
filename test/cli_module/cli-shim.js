@@ -3,16 +3,18 @@
 var path = require('path');
 var assert = require('assert');
 var expectedShim = process.env.EXPECT_SHIM;
-var expectedCli = process.env.EXPECT_CLI;
+var expectedLocal = process.env.EXPECT_LOCAL;
+var expectedGlobal = process.env.EXPECT_GLOBAL;
+var expectedLocation = process.env.EXPECT_LOCATION;
 var fixtureBase = process.env.FALLBACK_CLI_FIXTURE_BASE;
-var expectedLocation = expectedCli === 'global' ? 'global' : 'local';
 var expectedVersions = {
 	a: '0.0.1',
 	b: '0.0.2',
-	global: '0.0.3'
+	global: '0.0.3',
+	null: null
 };
-var expectedShimVersion = expectedVersions[expectedShim];
-var expectedCliVersion = expectedLocation === 'global' ? null : expectedVersions[expectedCli];
+var expectedGlobalVersion = expectedVersions[expectedGlobal];
+var expectedLocalVersion = expectedVersions[expectedLocal];
 
 var shimPath = relative(__filename);
 console.log('  shim: ' + shimPath);
@@ -44,16 +46,48 @@ require('fallback-cli')(
 		var cliModule = require(options.cli);
 		console.log('  run:', options.location, cliModule);
 		assert.strictEqual(options.location, expectedLocation);
-		assert.strictEqual(cliModule, expectedCli);
 
-		var shimPkg = require(options.globalPkg);
-		assert.strictEqual(shimPkg.version, expectedShimVersion);
-
-		if (expectedCliVersion === null) {
-			assert.strictEqual(options.localPkg, null);
+		if (expectedLocation === 'global') {
+			assert.strictEqual(cliModule, expectedGlobal);
 		} else {
-			var localPkg = require(options.localPkg);
-			assert.strictEqual(localPkg.version, expectedCliVersion);
+			assert.strictEqual(expectedLocation, 'local', 'expected location must be "global" or "local"');
+			assert.strictEqual(cliModule, expectedLocal);
+		}
+
+		assert(!(expectedGlobal === 'null' && expectedLocal === 'null'), 'they can not both be null');
+
+		if (expectedGlobal === 'null') {
+			assert.strictEqual(options.globalCli, null, 'globalCli');
+			assert.strictEqual(options.globalPkg, null, 'globalPkg');
+		} else {
+			assert.strictEqual(
+				require(options.globalCli),
+				expectedGlobal
+			);
+			assert.strictEqual(
+				require(options.globalPkg).version,
+				expectedGlobalVersion
+			);
+		}
+
+		if (expectedLocal === 'null') {
+			assert.strictEqual(options.localCli, null, 'localCli');
+			assert.strictEqual(options.localPkg, null, 'localPkg');
+			assert.strictEqual(options.cli, options.globalCli, 'cli should be the same as globalCli');
+			assert.strictEqual(options.pkg, options.globalPkg, 'pkg should be the same as globalPkg');
+		} else {
+			assert.strictEqual(
+				require(options.localCli),
+				expectedLocal,
+				'localCli'
+			);
+			assert.strictEqual(
+				require(options.localPkg).version,
+				expectedLocalVersion,
+				'localPkg'
+			);
+			assert.strictEqual(options.cli, options.localCli, 'cli should be the same as localCli');
+			assert.strictEqual(options.pkg, options.localPkg, 'pkg should be the same as localPkg');
 		}
 
 		console.log();

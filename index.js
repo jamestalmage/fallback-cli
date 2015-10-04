@@ -18,6 +18,9 @@ module.exports = function (opts) {
 	}
 
 	var globalCli = resolveSync(opts.relative, shimDirectory);
+	if (globalCli === localCli) {
+		globalCli = null;
+	}
 	var globalPkg = null;
 	if (globalCli) {
 		globalPkg = resolveSync(
@@ -37,6 +40,7 @@ module.exports = function (opts) {
 		globalCli: globalCli,
 		globalPkg: globalPkg,
 		cli: localCli || globalCli,
+		pkg: localCli ? localPkg : globalPkg,
 		location: localCli ? 'local' : 'global'
 	};
 
